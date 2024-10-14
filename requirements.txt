@@ -1,0 +1,8 @@
+cairosvg
+lets-plot
+pandas
+seaborn
+vega-datasets
+scikit-learn
+scipy
+jupyter

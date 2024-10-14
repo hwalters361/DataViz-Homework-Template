@@ -1,0 +1,101 @@
+---
+title: "Homework [number]: [Report title]"
+subtitle: Data Analytics and Visualization, Fall 2024
+author: Students
+institute: Harvey Mudd College
+date: September 2024
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+---
+
+# Template overview
+
+This template is designed to give you a starting point for authoring homework assignments using [Quarto](https://quarto.org/docs/get-started/hello/jupyter.html
+). Open `report.html` for a rendered version of this document.
+
+When creating a homework assignment, replace the content of this template with your report and replace the title and header information with the appropriate assignment, title and group members.
+
+## Submitting
+
+You should submit assignments as an HTML file. The sections below specify how to render either Quarto files or Jupyter Notebooks to HTML. Submit assignments as a group on Canvas.
+
+## Getting set-up: Python
+
+If you do not already have an existing python enviornment for working on this assignment. the included `setup.sh` script (for macos and linux) will create a python virtual enviornment in current directory and install a set of nessecary packages.
+
+## Getting set-up: Jupyter
+
+If you'd like to work directly in a jupyter notebook, you can work in the included `report.ipynb` notebook. Make sure not to delete the header information in the first cell.
+
+With Quarto installed you can then render the notebook into an HTML page using the following command:
+```{python}
+#| eval: false
+#| code-fold: false
+quarto preview report.ipynb --no-browser --no-watch-inputs
+```
+
+
+## Getting set-up: Quarto
+
+The Quarto website has good instructions for setting up Quarto with [VSCode](https://quarto.org/docs/get-started/hello/vscode.html).
+
+In VSCode you can render this document by opening the menu at the top left and selecting `preview`:
+
+![](vscode_preview.png)
+
+If you'd prefer to work from the command line, then with Quarto installed you can render this document with the shell command:
+
+```{python}
+#| eval: false
+#| code-fold: false
+
+quarto preview report.qmd --no-browser --no-watch-inputs
+```
+
+Either approach will (re-)create the file named `report.html`
+
+
+
+
+# Quarto basics
+
+The sections below go over some of the basic functions you can accomplish with quarto. See the [Quarto website](https://quarto.org/docs/guide) for many more details and examples.
+
+## Formatting with Markdown
+
+Basic formatting in Quarto is accomplished with [Markdown](https://quarto.org/docs/authoring/markdown-basics.html). 
+
+A few basic markdown commands are worth knowing:
+
+- `# Heading` creates a section heading as shown above.
+    - `## Sub-heading` Adding more `#` marks indicated sub-headings
+- `*italic*` creates *italicized text*
+- `**bold**` creates **bolded text**
+- `$equation$`$ creates a latex-style equation e.g. $y=ax+b$
+- `![](path/to/image.png)` Embeds an image at the given path
+
+## Writing code
+
+Python code can be embedded in block as follows:
+
+```{python}
+print('Hello world')
+```
+
+This works with graphical outputs too:
+```{python}
+from lets_plot import *
+import numpy as np
+LetsPlot.setup_html()
+
+ggplot() + geom_point(aes(x=np.random.random(25), y=np.random.random(25)))
+```
+
+This template is designed to hide code in the output by default. If you'd like to force a code block to always be shown you can set the `code-fold` option to `false`. 
+
+```{python}
+#| code-fold: false
+print('Hello world')
+```
