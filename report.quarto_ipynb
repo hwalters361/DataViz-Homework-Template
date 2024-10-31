@@ -1,0 +1,178 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Homework [number]: [Report title]\"\n",
+        "subtitle: Data Analytics and Visualization, Fall 2024\n",
+        "author: Students\n",
+        "institute: Harvey Mudd College\n",
+        "date: September 2024\n",
+        "format: \n",
+        "  html:\n",
+        "    self-contained: true\n",
+        "    code-fold: true\n",
+        "---\n",
+        "\n",
+        "\n",
+        "# Template overview\n",
+        "\n",
+        "This template is designed to give you a starting point for authoring homework assignments using [Quarto](https://quarto.org/docs/get-started/hello/jupyter.html\n",
+        "). Open `report.html` for a rendered version of this document.\n",
+        "\n",
+        "When creating a homework assignment, replace the content of this template with your report and replace the title and header information with the appropriate assignment, title and group members.\n",
+        "\n",
+        "## Submitting\n",
+        "\n",
+        "You should submit assignments as an HTML file. The sections below specify how to render either Quarto files or Jupyter Notebooks to HTML. Submit assignments as a group on Canvas.\n",
+        "\n",
+        "## Getting set-up: Python\n",
+        "\n",
+        "If you do not already have an existing python enviornment for working on this assignment. the included `setup.sh` script (for macos and linux) will create a python virtual enviornment in current directory and install a set of nessecary packages.\n",
+        "\n",
+        "## Getting set-up: Jupyter\n",
+        "\n",
+        "If you'd like to work directly in a jupyter notebook, you can work in the included `report.ipynb` notebook. Make sure not to delete the header information in the first cell.\n",
+        "\n",
+        "With Quarto installed you can then render the notebook into an HTML page using the following command:"
+      ],
+      "id": "2d040508"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| eval: false\n",
+        "#| code-fold: false\n",
+        "quarto preview report.ipynb --no-browser --no-watch-inputs"
+      ],
+      "id": "a830b9da",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Getting set-up: Quarto\n",
+        "\n",
+        "The Quarto website has good instructions for setting up Quarto with [VSCode](https://quarto.org/docs/get-started/hello/vscode.html).\n",
+        "\n",
+        "In VSCode you can render this document by opening the menu at the top left and selecting `preview`:\n",
+        "\n",
+        "![](vscode_preview.png)\n",
+        "\n",
+        "If you'd prefer to work from the command line, then with Quarto installed you can render this document with the shell command:\n"
+      ],
+      "id": "d3be5b29"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| eval: false\n",
+        "#| code-fold: false\n",
+        "\n",
+        "quarto preview report.qmd --no-browser --no-watch-inputs"
+      ],
+      "id": "47fc0119",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Either approach will (re-)create the file named `report.html`\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "# Quarto basics\n",
+        "\n",
+        "The sections below go over some of the basic functions you can accomplish with quarto. See the [Quarto website](https://quarto.org/docs/guide) for many more details and examples.\n",
+        "\n",
+        "## Formatting with Markdown\n",
+        "\n",
+        "Basic formatting in Quarto is accomplished with [Markdown](https://quarto.org/docs/authoring/markdown-basics.html). \n",
+        "\n",
+        "A few basic markdown commands are worth knowing:\n",
+        "\n",
+        "- `# Heading` creates a section heading as shown above.\n",
+        "    - `## Sub-heading` Adding more `#` marks indicated sub-headings\n",
+        "- `*italic*` creates *italicized text*\n",
+        "- `**bold**` creates **bolded text**\n",
+        "- `$equation$`$ creates a latex-style equation e.g. $y=ax+b$\n",
+        "- `![](path/to/image.png)` Embeds an image at the given path\n",
+        "\n",
+        "## Writing code\n",
+        "\n",
+        "Python code can be embedded in block as follows:\n"
+      ],
+      "id": "eabf86a7"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "print('Hello world')"
+      ],
+      "id": "d31e512a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "This works with graphical outputs too:"
+      ],
+      "id": "095e841f"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from lets_plot import *\n",
+        "import numpy as np\n",
+        "LetsPlot.setup_html()\n",
+        "\n",
+        "ggplot() + geom_point(aes(x=np.random.random(25), y=np.random.random(25)))"
+      ],
+      "id": "7b43282a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "This template is designed to hide code in the output by default. If you'd like to force a code block to always be shown you can set the `code-fold` option to `false`. \n"
+      ],
+      "id": "ee73a79d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| code-fold: false\n",
+        "print('Hello world')"
+      ],
+      "id": "79c3c47c",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Library/Frameworks/Python.framework/Versions/3.12/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

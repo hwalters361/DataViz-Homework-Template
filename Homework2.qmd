@@ -1,0 +1,141 @@
+---
+title: "Homework 2: NBA Data Visualization Part 2"
+subtitle: Data Analytics and Visualization, Fall 2024
+author: Hayley Walters, Anjeli Mayoraz
+institute: Harvey Mudd College
+date: September 2024
+format: 
+  html:
+    self-contained: true
+    code-fold: true
+---
+
+# Scoring Insights: Analyzing the Los Angeles Lakers' Performance Trends and Season Dynamics 
+
+## Motivation
+
+Basketball is more than just a game—it's a sport that influences both fans and professionals alike, from casual enthusiasts to coaches and analysts. In this report, we will analyze game statistics obtained from Kaggle, focusing specifically on one of the most iconic teams in NBA history; the Los Angeles Lakers. By looking at historical data, we can track the Lakers' progress and identify trends in their performance over time. This can help them understand how the team has evolved and assess their potential for future success. We can also observe key game statistics to see the relationship between these statistics, to see which variables are dependent or independent of each other and make better game predictions. This analysis has implications for Lakers fans and sports betters who could use this data to predict the outcome of future games and seasons or to better understand the relationship between different basketball metrics.
+
+## Setup
+
+First we include our necessary imports:
+
+```{python}
+from plotnine import *
+import numpy as np
+import pandas as pd
+from scipy.stats import norm
+```
+
+Then we read in a CSV file of our NBA game data. This is from the Kaggle NBA basketball dataset and we are using the data file "game.csv". [Here's the link](https://www.kaggle.com/datasets/wyattowalsh/basketball).
+
+
+```{python}
+game = pd.read_csv('game.csv')
+game.head()
+```
+
+Next we will drop all rows of this dataset that are missing data
+```{python}
+game_cleaned = game.dropna()
+```
+
+We are only interested in the Laker's game data. We will exclude all rows except for the Lakers:
+
+```{python}
+lakers = game_cleaned[(game_cleaned['team_name_home'] == 'Los Angeles Lakers') | (game_cleaned['team_name_away'] == 'Los Angeles Lakers')]
+lakers.head()
+```
+
+The variables that we will use in this report are `team_name_home` (str), `team_name_away` (str), `game_date` (date), `pts_home` (int), `pts_away` (int), and `season_type` (str).
+
+## First Visualization - Yearly Points Analysis: Lakers' Performance Across Season Types
+
+Now we will visualize the performance of the Lakers in all recorded games. We visualize below the points the Lakers score per-game year by year. We can also compare the performance by season type: whether the Lakers played in the Playoffs, Pre Season, or the Regular Season.
+
+```{python}
+lakers_year_points = lakers[['game_date', 'pts_home', 'pts_away', 'team_name_home', 'team_name_away', 'season_type']].copy()
+
+lakers_year_points['year'] = pd.to_datetime(lakers_year_points['game_date']).dt.year
+
+lakers_year_points['lakers_pts'] = np.where(lakers_year_points['team_name_home'] == 'Los Angeles Lakers', lakers_year_points['pts_home'], lakers_year_points['pts_away'])
+
+p = (ggplot(lakers_year_points, aes(x='year', y='lakers_pts', color='season_type'))
+     + geom_point(alpha=0.6)
+     + labs(x='Year', y='Lakers Points', color='Season Type',
+            title='Relationship Between Year and Lakers Points by Season Type'))
+
+p.show()
+```
+
+We can see from this graph that the Laker's generally perform similarly year by year, and this performance is similarly distributed no matter the type of season they are playing in. There seems to be a slight decrease in the general number of points they score per game from 1985 to 2000. We can also see from this graph generally how many games the Laker's are playing, and we can see when the team started to play Pre-Season games (around the mid 2000s). This also gives us a better idea of the ratio of Pre-Season games and Playoff games the Lakers play in comparison to Regular season games. The number of Regular Season games greatly outnumbers Pre-Season or Playoff games by a large margin. Specifically, the Lakers have played 377 Playoff games, 109 Pre Season games, and 2944 Regular Season games.
+
+This visualization uses three variables from our dataset: The year a game was played (interval), the number of points scored (interval), and the type of season that the game was played in (nominal). 
+
+This visualization improves upon the previous one by reporting the average points scored per game for each year and for each season type:
+
+```{python}
+lakers_yearly_avg_pts = lakers_year_points.groupby(['year', 'season_type'])['lakers_pts'].mean().reset_index()
+
+p = (ggplot(lakers_yearly_avg_pts, aes(x='year', y='lakers_pts', color='season_type'))
+     + geom_line()
+     + labs(x='Year', y='Average Lakers Points', color='Season Type',
+            title='Average Lakers Points Per Year by Season Type')
+     
+     )
+
+
+p.show()
+```
+
+This plot better shows the general typ around the 2000s in points scored per game in comparison to the games played before 1990. Additionally, it is more clearly obvious how variable the average of the points scored is. From this, we can conclude that the performance of the Lakers is comparable across season types and the average points scored each year can be highly variable, but usually sticks around 90 to 120 each year. 
+
+This visualization involved aggregating the data, grouping it by season and then calculating the yearly mean. It also involves 2 interval variables and one nominal variable.
+
+Here is another visualization to show the number of points that the Lakers score depending on what season they play in:
+
+```{python}
+p = (ggplot(lakers_year_points, aes(x='season_type', y='lakers_pts', fill='season_type'))
+     + geom_boxplot()
+     + labs(x='Season Type', y='Lakers Points', fill='Season Type',
+            title='Lakers Points by Season Type')
+     + scale_fill_manual(values=['#000000', '#552583', '#FDB927']) 
+     )
+
+p.show()
+```
+
+Here we can better compare the performance of the Lakers depending on the season they perform in. The Regular Season mean is higher than both the Pre-Season and the Playoffs season. Although the difference in performance between each of these seasons is small and not statistically significant, the Lakers appear to perform the worst in the Pre-Season in comparison to their Regular Season performance. This may be important to note when predicting the Lakers performance in future Pre-Season games.
+
+
+
+## Second Visualization - Lakers Points Versus Opponent Points
+
+One thing that we were curious about while interacting this data was whether or not the number of points the Lakers scored and the number of points their opponent scored were related to each other. If they are not related, this suggests that the number of points scored by each team is uniform or equally likely. If they are related, then we could possibly infer the number of points the Lakers will score depending on the number of points their opponents scored. This might have some implications for sports betting, as some pairs of points may be more likely than others. We started by plotting the distribution of the two:
+
+```{python}
+lakers_points = lakers[['pts_home', 'pts_away']].copy()
+
+lakers_points['lakers_pts'] = np.where(lakers['team_name_home'] == 'Los Angeles Lakers', lakers_points['pts_home'], lakers_points['pts_away'])
+lakers_points['opponent_pts'] = np.where(lakers['team_name_home'] == 'Los Angeles Lakers', lakers_points['pts_away'], lakers_points['pts_home'])
+
+p = (ggplot(lakers_points, aes(x='lakers_pts', y='opponent_pts'))
+     + geom_bin2d()
+     + labs(x='Lakers Points', y='Opponent Points',
+            title='Density Plot: Lakers Points vs. Opponent Points'))
+
+p.show()
+```
+
+Next we calculated the correlation between the two variables:
+
+```{python}
+correlation = lakers_points['lakers_pts'].corr(lakers_points['opponent_pts'])
+print(f"Correlation between Lakers points and opponent points: {correlation}")
+```
+
+There is a slight positive correlation between the two variables, meaning that the number of points the Lakers score does depend on their opponent. If an opponent happens to score higher, it is more likely that the Lakers will similarly score higher as well.
+
+## Conclusion
+
+In conclusion, our analysis of the Los Angeles Lakers' performance through various visualizations has provided valuable insights into their historical game statistics. By examining the points scored over the years and across different season types, we observed consistent trends, including a notable decrease in points from 1985 to 2000 and variability in average scores, particularly around the 2000s. The comparative box plots revealed that while the Lakers perform best in the Regular Season, the differences between season types were marginal. Furthermore, our exploration of the relationship between the points scored by the Lakers and their opponents indicated a slight positive correlation, suggesting that understanding opponent performance may aid in predicting future outcomes. This analysis not only enriches our understanding of the Lakers' dynamics but also serves as a resource for fans, analysts, and sports bettors seeking to navigate the complexities of basketball performance metrics.
