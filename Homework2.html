@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Hayley Walters, Anjeli Mayoraz">
-<meta name="dcterms.date" content="2024-09-01">
+<meta name="dcterms.date" content="2024-10-30">
 
 <title>Homework 2: NBA Data Visualization Part 2</title>
 <style>
@@ -3116,7 +3116,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 1, 2024</p>
+      <p class="date">October 30, 2024</p>
     </div>
   </div>
   
@@ -3137,7 +3137,7 @@ vertical-align: -.125em;
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
 <p>First we include our necessary imports:</p>
-<div id="95bc59e8" class="cell" data-execution_count="1">
+<div id="fbcb8274" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> <span class="op">*</span></span>
@@ -3147,7 +3147,7 @@ vertical-align: -.125em;
 </details>
 </div>
 <p>Then we read in a CSV file of our NBA game data. This is from the Kaggle NBA basketball dataset and we are using the data file “game.csv”. <a href="https://www.kaggle.com/datasets/wyattowalsh/basketball">Here’s the link</a>.</p>
-<div id="f88a2db0" class="cell" data-execution_count="2">
+<div id="2a162650" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>game <span class="op">=</span> pd.read_csv(<span class="st">&#39;game.csv&#39;</span>)</span>
@@ -3313,14 +3313,14 @@ vertical-align: -.125em;
 </div>
 </div>
 <p>Next we will drop all rows of this dataset that are missing data</p>
-<div id="be8ff162" class="cell" data-execution_count="3">
+<div id="193e7a98" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>game_cleaned <span class="op">=</span> game.dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>We are only interested in the Laker’s game data. We will exclude all rows except for the Lakers:</p>
-<div id="d0c7ea2f" class="cell" data-execution_count="4">
+<div id="ab35dd1e" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>lakers <span class="op">=</span> game_cleaned[(game_cleaned[<span class="st">&#39;team_name_home&#39;</span>] <span class="op">==</span> <span class="st">&#39;Los Angeles Lakers&#39;</span>) <span class="op">|</span> (game_cleaned[<span class="st">&#39;team_name_away&#39;</span>] <span class="op">==</span> <span class="st">&#39;Los Angeles Lakers&#39;</span>)]</span>
@@ -3490,7 +3490,7 @@ vertical-align: -.125em;
 <section id="first-visualization---yearly-points-analysis-lakers-performance-across-season-types" class="level2">
 <h2 class="anchored" data-anchor-id="first-visualization---yearly-points-analysis-lakers-performance-across-season-types">First Visualization - Yearly Points Analysis: Lakers’ Performance Across Season Types</h2>
 <p>Now we will visualize the performance of the Lakers in all recorded games. We visualize below the points the Lakers score per-game year by year. We can also compare the performance by season type: whether the Lakers played in the Playoffs, Pre Season, or the Regular Season.</p>
-<div id="66863227" class="cell" data-execution_count="5">
+<div id="6e9e92bf" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>lakers_year_points <span class="op">=</span> lakers[[<span class="st">&#39;game_date&#39;</span>, <span class="st">&#39;pts_home&#39;</span>, <span class="st">&#39;pts_away&#39;</span>, <span class="st">&#39;team_name_home&#39;</span>, <span class="st">&#39;team_name_away&#39;</span>, <span class="st">&#39;season_type&#39;</span>]].copy()</span>
@@ -3507,7 +3507,7 @@ vertical-align: -.125em;
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>p.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/56/lnrgwj295yq6l00hqdbfzfmr0000gn/T/ipykernel_36006/322724926.py:3: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.</code></pre>
+<pre><code>/var/folders/56/lnrgwj295yq6l00hqdbfzfmr0000gn/T/ipykernel_37050/322724926.py:3: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -3520,7 +3520,7 @@ vertical-align: -.125em;
 <p>We can see from this graph that the Laker’s generally perform similarly year by year, and this performance is similarly distributed no matter the type of season they are playing in. There seems to be a slight decrease in the general number of points they score per game from 1985 to 2000. We can also see from this graph generally how many games the Laker’s are playing, and we can see when the team started to play Pre-Season games (around the mid 2000s). This also gives us a better idea of the ratio of Pre-Season games and Playoff games the Lakers play in comparison to Regular season games. The number of Regular Season games greatly outnumbers Pre-Season or Playoff games by a large margin. Specifically, the Lakers have played 377 Playoff games, 109 Pre Season games, and 2944 Regular Season games.</p>
 <p>This visualization uses three variables from our dataset: The year a game was played (interval), the number of points scored (interval), and the type of season that the game was played in (nominal).</p>
 <p>This visualization improves upon the previous one by reporting the average points scored per game for each year and for each season type:</p>
-<div id="9bb11bd7" class="cell" data-execution_count="6">
+<div id="6539de10" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>lakers_yearly_avg_pts <span class="op">=</span> lakers_year_points.groupby([<span class="st">&#39;year&#39;</span>, <span class="st">&#39;season_type&#39;</span>])[<span class="st">&#39;lakers_pts&#39;</span>].mean().reset_index()</span>
@@ -3546,7 +3546,7 @@ vertical-align: -.125em;
 <p>This plot better shows the general typ around the 2000s in points scored per game in comparison to the games played before 1990. Additionally, it is more clearly obvious how variable the average of the points scored is. From this, we can conclude that the performance of the Lakers is comparable across season types and the average points scored each year can be highly variable, but usually sticks around 90 to 120 each year.</p>
 <p>This visualization involved aggregating the data, grouping it by season and then calculating the yearly mean. It also involves 2 interval variables and one nominal variable.</p>
 <p>Here is another visualization to show the number of points that the Lakers score depending on what season they play in:</p>
-<div id="ff85ff2f" class="cell" data-execution_count="7">
+<div id="099167ec" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> (ggplot(lakers_year_points, aes(x<span class="op">=</span><span class="st">&#39;season_type&#39;</span>, y<span class="op">=</span><span class="st">&#39;lakers_pts&#39;</span>, fill<span class="op">=</span><span class="st">&#39;season_type&#39;</span>))</span>
@@ -3571,7 +3571,7 @@ vertical-align: -.125em;
 <section id="second-visualization---lakers-points-versus-opponent-points" class="level2">
 <h2 class="anchored" data-anchor-id="second-visualization---lakers-points-versus-opponent-points">Second Visualization - Lakers Points Versus Opponent Points</h2>
 <p>One thing that we were curious about while interacting this data was whether or not the number of points the Lakers scored and the number of points their opponent scored were related to each other. If they are not related, this suggests that the number of points scored by each team is uniform or equally likely. If they are related, then we could possibly infer the number of points the Lakers will score depending on the number of points their opponents scored. This might have some implications for sports betting, as some pairs of points may be more likely than others. We started by plotting the distribution of the two:</p>
-<div id="6f73c78a" class="cell" data-execution_count="8">
+<div id="edd6c69a" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>lakers_points <span class="op">=</span> lakers[[<span class="st">&#39;pts_home&#39;</span>, <span class="st">&#39;pts_away&#39;</span>]].copy()</span>
@@ -3595,7 +3595,7 @@ vertical-align: -.125em;
 </div>
 </div>
 <p>Next we calculated the correlation between the two variables:</p>
-<div id="47cccda5" class="cell" data-execution_count="9">
+<div id="44099803" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>correlation <span class="op">=</span> lakers_points[<span class="st">&#39;lakers_pts&#39;</span>].corr(lakers_points[<span class="st">&#39;opponent_pts&#39;</span>])</span>

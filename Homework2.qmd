@@ -3,7 +3,7 @@ title: "Homework 2: NBA Data Visualization Part 2"
 subtitle: Data Analytics and Visualization, Fall 2024
 author: Hayley Walters, Anjeli Mayoraz
 institute: Harvey Mudd College
-date: September 2024
+date: October 30 2024
 format: 
   html:
     self-contained: true
