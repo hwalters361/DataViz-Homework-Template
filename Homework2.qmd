@@ -10,11 +10,15 @@ format:
     code-fold: true
 ---
 
-# Scoring Insights: Analyzing the Los Angeles Lakers' Performance Trends and Season Dynamics 
+# NBA Statistics: Analyzing and Visualizing Individual Player Statistics
 
 ## Motivation
 
-Basketball is more than just a game—it's a sport that influences both fans and professionals alike, from casual enthusiasts to coaches and analysts. In this report, we will analyze game statistics obtained from Kaggle, focusing specifically on one of the most iconic teams in NBA history; the Los Angeles Lakers. By looking at historical data, we can track the Lakers' progress and identify trends in their performance over time. This can help them understand how the team has evolved and assess their potential for future success. We can also observe key game statistics to see the relationship between these statistics, to see which variables are dependent or independent of each other and make better game predictions. This analysis has implications for Lakers fans and sports betters who could use this data to predict the outcome of future games and seasons or to better understand the relationship between different basketball metrics.
+The National Basketball Association (NBA) is home to some of the most elite athletes in the world, with player salaries reflecting their exceptional talent, marketability, and contributions to their teams. However, the factors influencing these salaries often extend beyond performance, encompassing physical characteristics, playing time, and positional roles. This report delves into the intricate relationships between NBA player salaries and various attributes, including height, weight, minutes played, and the positions players occupy on the court.
+
+By examining these connections, we aim to uncover patterns and insights that shed light on how player attributes impact their value in the league. Additionally, this report features an interactive tool that allows readers to input their height and weight to discover the NBA position most suited to their physical profile, providing a fun and engaging way to explore the data.
+
+Through visualizations and analysis, this report aims to present a comprehensive perspective on the dynamic interplay of physical traits, performance metrics, and financial considerations in professional basketball.
 
 ## Setup
 
@@ -31,10 +35,68 @@ Then we read in a CSV file of our NBA game data. This is from the Kaggle NBA bas
 
 
 ```{python}
+# load game data
 game = pd.read_csv('game.csv')
-game.head()
+# game.head()
 ```
 
+```{python}
+# load player data
+player = pd.read_csv('common_player_info.csv')
+# player.head()
+```
+
+```{python}
+draft = pd.read_csv('draft_history.csv')
+# draft.head()
+```
+```{python}
+pstats = pd.read_csv('draft_combine_stats.csv')
+# pstats.head()
+```
+
+```{python}
+position_stats = pstats.groupby('position')[['height_wo_shoes', 'weight']].describe()
+position_stats
+```
+
+```{python}
+p = ggplot(pstats, aes(x='height_wo_shoes', color='position')) + geom_density() + ggtitle('Height Distribution by Position')
+p.show()
+```
+
+```{python}
+p = ggplot(pstats, aes(x='height_wo_shoes', y='weight', color='position')) + geom_point() + ggtitle('Player Characteristics by Position')
+p.show()
+```
+
+```{python}
+position_means = pstats.groupby('position')['height_wo_shoes'].mean().sort_values(ascending=False).reset_index()
+
+# Create the histogram with bars in descending order
+(ggplot(position_means, aes(x='position', y='height_wo_shoes')) +
+  geom_bar(stat='identity') +
+  ggtitle('Average Height by Position (Descending Order)') +
+  theme(axis_text_x=element_text(rotation=45, hjust=1)) # Rotate x-axis labels for better readability
+)
+```
+
+
+```{python}
+def predict_position(user_height, user_weight, position_stats):
+    position_means = pstats.groupby('position')[['height_wo_shoes', 'weight']].mean()
+    distances = ((position_means - [user_height, user_weight])**2).sum(axis=1).pow(0.5)
+    return distances.idxmin()
+```
+
+```{python}
+user_height = float(input("Enter your height (in inches): "))
+user_weight = float(input("Enter your weight (in pounds): "))
+position = predict_position(user_height, user_weight, position_stats)
+print(f"You are most likely to play as a {position}.")
+```
+
+<!-- 
 Next we will drop all rows of this dataset that are missing data
 ```{python}
 game_cleaned = game.dropna()
@@ -94,6 +156,7 @@ The visualization was created by aggregating the data, grouping it by season typ
 
 Here is another visualization that illustrates the points scored by the Lakers based on the season type alone:
 
+
 ```{python}
 p = (ggplot(lakers_year_points, aes(x='season_type', y='lakers_pts', fill='season_type'))
      + geom_boxplot()
@@ -140,4 +203,4 @@ The analysis reveals a slight positive correlation between the points scored by 
 
 ## Conclusion
 
-In conclusion, our analysis of the Los Angeles Lakers' performance through various visualizations has provided valuable insights into their historical game statistics. By examining the points scored over the years and across different season types, we observed consistent trends, including a notable decrease in points from 1985 to 2000 and variability in average scores, particularly around the 2000s. The comparative box plots revealed that while the Lakers perform best in the Regular Season, the differences between season types were marginal. Furthermore, our exploration of the relationship between the points scored by the Lakers and their opponents indicated a slight positive correlation, suggesting that understanding opponent performance may aid in predicting future outcomes. This analysis not only enriches our understanding of the Lakers' dynamics but also serves as a resource for fans, analysts, and sports bettors seeking to navigate the complexities of basketball performance metrics.
+In conclusion, our analysis of the Los Angeles Lakers' performance through various visualizations has provided valuable insights into their historical game statistics. By examining the points scored over the years and across different season types, we observed consistent trends, including a notable decrease in points from 1985 to 2000 and variability in average scores, particularly around the 2000s. The comparative box plots revealed that while the Lakers perform best in the Regular Season, the differences between season types were marginal. Furthermore, our exploration of the relationship between the points scored by the Lakers and their opponents indicated a slight positive correlation, suggesting that understanding opponent performance may aid in predicting future outcomes. This analysis not only enriches our understanding of the Lakers' dynamics but also serves as a resource for fans, analysts, and sports bettors seeking to navigate the complexities of basketball performance metrics. -->

@@ -1,0 +1,389 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Homework 2: NBA Data Visualization Part 2\"\n",
+        "subtitle: Data Analytics and Visualization, Fall 2024\n",
+        "author: Hayley Walters, Anjeli Mayoraz\n",
+        "institute: Harvey Mudd College\n",
+        "date: October 30 2024\n",
+        "format: \n",
+        "  html:\n",
+        "    self-contained: true\n",
+        "    code-fold: true\n",
+        "---\n",
+        "\n",
+        "\n",
+        "# NBA Statistics: Analyzing and Visualizing Individual Player Statistics\n",
+        "\n",
+        "## Motivation\n",
+        "\n",
+        "The National Basketball Association (NBA) is home to some of the most elite athletes in the world, with player salaries reflecting their exceptional talent, marketability, and contributions to their teams. However, the factors influencing these salaries often extend beyond performance, encompassing physical characteristics, playing time, and positional roles. This report delves into the intricate relationships between NBA player salaries and various attributes, including height, weight, minutes played, and the positions players occupy on the court.\n",
+        "\n",
+        "By examining these connections, we aim to uncover patterns and insights that shed light on how player attributes impact their value in the league. Additionally, this report features an interactive tool that allows readers to input their height and weight to discover the NBA position most suited to their physical profile, providing a fun and engaging way to explore the data.\n",
+        "\n",
+        "Through visualizations and analysis, this report aims to present a comprehensive perspective on the dynamic interplay of physical traits, performance metrics, and financial considerations in professional basketball.\n",
+        "\n",
+        "## Setup\n",
+        "\n",
+        "First we include our necessary imports:\n"
+      ],
+      "id": "dc2300d4"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "from plotnine import *\n",
+        "import numpy as np\n",
+        "import pandas as pd\n",
+        "from scipy.stats import norm"
+      ],
+      "id": "b4861079",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Then we read in a CSV file of our NBA game data. This is from the Kaggle NBA basketball dataset and we are using the data file \"game.csv\". [Here's the link](https://www.kaggle.com/datasets/wyattowalsh/basketball).\n"
+      ],
+      "id": "93c404e2"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# load game data\n",
+        "game = pd.read_csv('game.csv')\n",
+        "# game.head()"
+      ],
+      "id": "f0c50679",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# load player data\n",
+        "player = pd.read_csv('common_player_info.csv')\n",
+        "# player.head()"
+      ],
+      "id": "b78157cd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "draft = pd.read_csv('draft_history.csv')\n",
+        "# draft.head()"
+      ],
+      "id": "6be7b7b0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "pstats = pd.read_csv('draft_combine_stats.csv')\n",
+        "# pstats.head()"
+      ],
+      "id": "cb8e43bf",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "position_stats = pstats.groupby('position')[['height_wo_shoes', 'weight']].describe()\n",
+        "position_stats"
+      ],
+      "id": "0f5fc3ab",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "p = ggplot(pstats, aes(x='height_wo_shoes', color='position')) + geom_density() + ggtitle('Height Distribution by Position')\n",
+        "p.show()"
+      ],
+      "id": "00c6ab71",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "p = ggplot(pstats, aes(x='height_wo_shoes', y='weight', color='position')) + geom_point() + ggtitle('Player Characteristics by Position')\n",
+        "p.show()"
+      ],
+      "id": "1cdfd01f",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "position_means = pstats.groupby('position')['height_wo_shoes'].mean().sort_values(ascending=False).reset_index()\n",
+        "\n",
+        "# Create the histogram with bars in descending order\n",
+        "(ggplot(position_means, aes(x='position', y='height_wo_shoes')) +\n",
+        "  geom_bar(stat='identity') +\n",
+        "  ggtitle('Average Height by Position (Descending Order)') +\n",
+        "  theme(axis_text_x=element_text(rotation=45, hjust=1)) # Rotate x-axis labels for better readability\n",
+        ")"
+      ],
+      "id": "db043248",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "def predict_position(user_height, user_weight, position_stats):\n",
+        "    position_means = pstats.groupby('position')[['height_wo_shoes', 'weight']].mean()\n",
+        "    distances = ((position_means - [user_height, user_weight])**2).sum(axis=1).pow(0.5)\n",
+        "    return distances.idxmin()"
+      ],
+      "id": "90e7d9bd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "user_height = float(input(\"Enter your height (in inches): \"))\n",
+        "user_weight = float(input(\"Enter your weight (in pounds): \"))\n",
+        "position = predict_position(user_height, user_weight, position_stats)\n",
+        "print(f\"You are most likely to play as a {position}.\")"
+      ],
+      "id": "ab22acfd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "<!-- \n",
+        "Next we will drop all rows of this dataset that are missing data"
+      ],
+      "id": "e8d9fdeb"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "game_cleaned = game.dropna()"
+      ],
+      "id": "82aeb18b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "We are only interested in the Laker's game data. We will exclude all rows except for the Lakers:\n"
+      ],
+      "id": "2eae99ba"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "lakers = game_cleaned[(game_cleaned['team_name_home'] == 'Los Angeles Lakers') | (game_cleaned['team_name_away'] == 'Los Angeles Lakers')]\n",
+        "lakers.head()"
+      ],
+      "id": "1b0b1e0e",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The variables that we will use in this report are `team_name_home` (str), `team_name_away` (str), `game_date` (date), `pts_home` (int), `pts_away` (int), and `season_type` (str).\n",
+        "\n",
+        "## First Visualization - Yearly Points Analysis: Lakers' Performance Across Season Types\n",
+        "\n",
+        "Now we will visualize the performance of the Lakers in all recorded games. We visualize below the points the Lakers score per-game year by year. We can also compare the performance by season type: whether the Lakers played in the Playoffs, Pre Season, or the Regular Season.\n"
+      ],
+      "id": "60719bd8"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "lakers_year_points = lakers[['game_date', 'pts_home', 'pts_away', 'team_name_home', 'team_name_away', 'season_type']].copy()\n",
+        "\n",
+        "lakers_year_points['year'] = pd.to_datetime(lakers_year_points['game_date']).dt.year\n",
+        "\n",
+        "lakers_year_points['lakers_pts'] = np.where(lakers_year_points['team_name_home'] == 'Los Angeles Lakers', lakers_year_points['pts_home'], lakers_year_points['pts_away'])\n",
+        "\n",
+        "p = (ggplot(lakers_year_points, aes(x='year', y='lakers_pts', color='season_type'))\n",
+        "     + geom_point(alpha=0.6)\n",
+        "     + labs(x='Year', y='Lakers Points', color='Season Type',\n",
+        "            title='Relationship Between Year and Lakers Points by Season Type'))\n",
+        "\n",
+        "p.show()"
+      ],
+      "id": "a17527b0",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The graph illustrates that the Lakers' performance has remained relatively consistent over the years, regardless of the season type. Notably, there is a slight decline in their average points scored per game from 1985 to 2000. Additionally, the graph provides insights into the number of games the Lakers have played, highlighting the introduction of Pre-Season games around the mid-2000s. This context allows for a clearer comparison of the ratios of Pre-Season and Playoff games to Regular Season games. The data shows that Regular Season games significantly outnumber both Pre-Season and Playoff games, with the Lakers participating in 2,944 Regular Season games, 377 Playoff games, and 109 Pre-Season games.\n",
+        "\n",
+        "This visualization employs three variables from our dataset: the year a game was played (interval), the number of points scored (interval), and the type of season (nominal).\n",
+        "\n",
+        "The next plot below visualizes the average points scored by the Lakers each year, categorized by season type. \n"
+      ],
+      "id": "7e5c4b32"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "lakers_yearly_avg_pts = lakers_year_points.groupby(['year', 'season_type'])['lakers_pts'].mean().reset_index()\n",
+        "\n",
+        "p = (ggplot(lakers_yearly_avg_pts, aes(x='year', y='lakers_pts', color='season_type'))\n",
+        "     + geom_line()\n",
+        "     + labs(x='Year', y='Average Lakers Points', color='Season Type',\n",
+        "            title='Average Lakers Points Per Year by Season Type')\n",
+        "     \n",
+        "     )\n",
+        "\n",
+        "\n",
+        "p.show()"
+      ],
+      "id": "94a6ae73",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "This plot effectively highlights the trends in average points scored per game around the 2000s, particularly when compared to games played before 1990. It also clearly illustrates the variability in average points scored. From the visualization, we can conclude that the Lakers’ performance is consistent across different season types, with annual average points typically ranging between 90 and 120, though with notable fluctuations.\n",
+        "\n",
+        "The visualization was created by aggregating the data, grouping it by season type, and calculating the yearly mean. It incorporates two interval variables and one nominal variable.\n",
+        "\n",
+        "Here is another visualization that illustrates the points scored by the Lakers based on the season type alone:\n"
+      ],
+      "id": "155f9bdc"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "p = (ggplot(lakers_year_points, aes(x='season_type', y='lakers_pts', fill='season_type'))\n",
+        "     + geom_boxplot()\n",
+        "     + labs(x='Season Type', y='Lakers Points', fill='Season Type',\n",
+        "            title='Lakers Points by Season Type')\n",
+        "     + scale_fill_manual(values=['#000000', '#552583', '#FDB927']) \n",
+        "     )\n",
+        "\n",
+        "p.show()"
+      ],
+      "id": "2114e9b3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "This plot allows for a clearer comparison of the Lakers' performance across different season types. It reveals that the average points scored during the Regular Season are higher than those in both the Pre-Season and Playoffs. While the differences in performance among these seasons are relatively small and not statistically significant, it appears that the Lakers tend to perform the weakest during the Pre-Season compared to their Regular Season performance. This insight may be valuable for predicting the Lakers' outcomes in future Pre-Season games.\n",
+        "\n",
+        "\n",
+        "\n",
+        "## Second Visualization - Lakers Points Versus Opponent Points\n",
+        "\n",
+        "We were particularly curious about the relationship between the points scored by the Lakers and those scored by their opponents. If these two variables are not related, it would suggest that the points scored by each team are uniformly distributed and equally likely. Conversely, if there is a relationship, we might infer the Lakers' scoring based on their opponents' performance. This insight could have implications for sports betting, as certain scoring pairs may be more likely than others.\n",
+        "\n",
+        "To explore this, we first plotted the distribution of points scored by both teams:\n"
+      ],
+      "id": "dfa30f05"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "lakers_points = lakers[['pts_home', 'pts_away']].copy()\n",
+        "\n",
+        "lakers_points['lakers_pts'] = np.where(lakers['team_name_home'] == 'Los Angeles Lakers', lakers_points['pts_home'], lakers_points['pts_away'])\n",
+        "lakers_points['opponent_pts'] = np.where(lakers['team_name_home'] == 'Los Angeles Lakers', lakers_points['pts_away'], lakers_points['pts_home'])\n",
+        "\n",
+        "p = (ggplot(lakers_points, aes(x='lakers_pts', y='opponent_pts'))\n",
+        "     + geom_bin2d()\n",
+        "     + labs(x='Lakers Points', y='Opponent Points',\n",
+        "            title='Density Plot: Lakers Points vs. Opponent Points'))\n",
+        "\n",
+        "p.show()"
+      ],
+      "id": "d0d012bd",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "Next we calculated the correlation between the two variables:\n"
+      ],
+      "id": "185da035"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "correlation = lakers_points['lakers_pts'].corr(lakers_points['opponent_pts'])\n",
+        "print(f\"Correlation between Lakers points and opponent points: {correlation}\")"
+      ],
+      "id": "f3074225",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "The analysis reveals a slight positive correlation between the points scored by the Lakers and those scored by their opponents. This indicates that when opponents score more, the Lakers are likely to score higher as well.\n",
+        "\n",
+        "## Conclusion\n",
+        "\n",
+        "In conclusion, our analysis of the Los Angeles Lakers' performance through various visualizations has provided valuable insights into their historical game statistics. By examining the points scored over the years and across different season types, we observed consistent trends, including a notable decrease in points from 1985 to 2000 and variability in average scores, particularly around the 2000s. The comparative box plots revealed that while the Lakers perform best in the Regular Season, the differences between season types were marginal. Furthermore, our exploration of the relationship between the points scored by the Lakers and their opponents indicated a slight positive correlation, suggesting that understanding opponent performance may aid in predicting future outcomes. This analysis not only enriches our understanding of the Lakers' dynamics but also serves as a resource for fans, analysts, and sports bettors seeking to navigate the complexities of basketball performance metrics. -->"
+      ],
+      "id": "d60002a4"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/hayleywalters/Desktop/clinic/data viz template/DataViz-Homework-Template/.venv/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}
